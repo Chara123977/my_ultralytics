@@ -1,0 +1,27 @@
+import warnings
+
+warnings.filterwarnings('ignore')
+from ultralytics import YOLO
+
+if __name__ == '__main__':
+    model = YOLO('last.pt') #ultralytics/cfg/models/11/yolo11.yaml
+    # 指定YOLO模型对象，并加载指定配置文件中的模型配置
+    # model = YOLO('yolo11n.pt')      #加载预训练的权重文件'yolov11n.pt'，加速训练并提升模型性能
+    model.train(data='ultralytics/cfg/datasets/data.yaml',  # 指定训练数据集的配置文件路径，这个.yaml文件包含了数据集的路径和类别信息
+                cache=False,  # 是否缓存数据集以加快后续训练速度，False表示不缓存
+                imgsz=640,  # 指定训练时使用的图像尺寸，640表示将输入图像调整为640x640像素
+                epochs=200,  # 设置训练的总轮数为200轮
+                batch=16,  # 设置每个训练批次的大小为32，即每次更新模型时使用32张图片
+                close_mosaic=10,  # 设置在训练结束前多少轮关闭 Mosaic 数据增强，10 表示在训练的最后 10 轮中关闭 Mosaic
+                workers=8,  # 设置用于数据加载的线程数为8，更多线程可以加快数据加载速度
+                patience=50,  # 在训练时，如果经过50轮性能没有提升，则停止训练（早停机制）
+                device='0',  # 指定使用的设备，'0'表示使用第一块GPU进行训练
+                # optimizer='SGD',  # 设置优化器为SGD（随机梯度下降），用于模型参数更新
+                optimizer = 'AdamW', #设置优化器为AdamW（带有权重衰减的Adam优化器），用于模型参数更新
+                lr0 = 0.01, #设置初始学习率为0.01
+                lrf = 0.2, #设置学习率衰减率为0.2
+                weight_decay = 0.0005, #设置权重衰减为0.0005
+                cos_lr = True, #是否使用余弦退火学习率
+                amp = True,  # 是否使用混合精度训练，混合精度训练可以加速训练，但是会占用更多显存
+                # resume = True
+                )
